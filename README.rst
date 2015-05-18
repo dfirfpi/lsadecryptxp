@@ -2,21 +2,20 @@
 LSA Decrypt XP
 ==============
 
-TODO here
+TODO.
 
 
 How to use
 ----------
 
 The decryption routine are included in a single file called *lsadecryptxp.py*.
+
 Inside *lsatest.py* testing code there is a simple example on how to use it.
 
 Licensing and Copyright
 -----------------------
 
 Copyright 2015 Francesco "dfirfpi" Picasso. All Rights Reserved.
-
-All Rights Reserved
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -39,3 +38,6 @@ Bugs and Support
 There is no support provided with this software. There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.
+
+For any bug or enhancement please use this site facilities.
+
