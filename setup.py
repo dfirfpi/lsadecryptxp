@@ -20,7 +20,7 @@ setup(
     description = 'NT 5.[12] LsaUnprotectMemory',
     long_description=open('README.rst').read(),
     license = "GPLv2+",
-    url = '',
+    url = 'https://github.com/dfirfpi/lsadecryptxp',
     keywords = '',
 
     py_modules = ['lsadecryptxp'],
