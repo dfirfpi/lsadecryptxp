@@ -4,12 +4,11 @@ LSA Decrypt XP
 
 Windows NT 5.1 and 5.2 LsaEncryptMemory decryption algorithm.
 
-On NT5, LsaEncryptMemory calls these lsasrv.dll functions: CBC,
-DESX, DES. DES and DESX decryption routine are completed, the CBC
-method is a bit branched, so only a partial implementation is here.
-Anyway it should be able to decrypt the encrypted data, provided you
-know the DES key 16-rounds scheduling and the IV, pointed by the debug
-symbols lsasrv!g_pDESXKey and lsasrv!g_Feedback.
+On NT5, LsaEncryptMemory calls these lsasrv.dll functions: CBC, DESX, DES.
+DES and DESX decryption routine are completed, the CBC method is a bit branched,
+so only a partial implementation is here. Anyway it should be able to decrypt the
+encrypted data, provided you know the DES key 16-rounds scheduling and the IV,
+pointed by the debug symbols lsasrv!g_pDESXKey and lsasrv!g_Feedback.
 
 
 How to use
