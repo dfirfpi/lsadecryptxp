@@ -27,6 +27,7 @@ class DecryptionTest(unittest.TestCase):
     """Decryption tests for LsaDecryptXp."""
 
     def setUp(self):
+
         self.feedback = '\x97\x37\x6f\xfb\xb7\x5e\xee\x86'
 
         self.desxkey = (

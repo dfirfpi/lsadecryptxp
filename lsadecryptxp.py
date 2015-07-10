@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-#
+'''Windows NT 5.1 and 5.2 LsaEncryptMemory decryption algorithm.'''
 
 import struct
 
 
 class XP_DES():
-    '''NT 5.1 and NT 5.2 lsasrv.dll DES decryption implementation.'''
+    '''NT 5.1 and NT 5.2 lsasrv.dll DES decryption 32 bits implementation.'''
 
     sboxul = [
       [0x02080800, 0x00080000, 0x02000002, 0x02080802,
@@ -170,15 +170,21 @@ class XP_DES():
 
         self.des_key = des_key
 
-    def rol(self, val, r_bits, max_bits):
-        '''Rotate left by Martin Falatic.'''
-        return ((val << r_bits % max_bits) & (2**max_bits-1) |
-                (val & (2**max_bits-1)) >> (max_bits-(r_bits % max_bits)))
+        # Fixed 32 bits architecture.
+        self.max_bits = 32
+        self.max_bits_mask = (2**self.max_bits - 1)
 
-    def ror(self, val, r_bits, max_bits):
-        '''Rotate right by Martin Falatic.'''
-        return (((val & (2**max_bits-1)) >> r_bits % max_bits) |
-                (val << (max_bits-(r_bits % max_bits)) & (2**max_bits-1)))
+    def rol(self, value, r_bits):
+        r_bits %= self.max_bits
+
+        return ((value << r_bits | (value >> (self.max_bits - r_bits))) &
+            self.max_bits_mask)
+
+    def ror(self, value, r_bits):
+        r_bits %= self.max_bits
+
+        return ((value << (self.max_bits - r_bits) | (value >> r_bits)) &
+            self.max_bits_mask)
 
     def _decrypt_loop(self, dst, src, ecx, round):
 
@@ -190,7 +196,7 @@ class XP_DES():
         edx &= 0x0CFCFCFCF
         ebx = (ebx & 0xFFFFFF00) | (eax & 0x000000FF)
         ecx = (ecx & 0xFFFFFF00) | ((eax & 0x0000FF00) >> 8)
-        edx = self.ror(edx, 4, 32)
+        edx = self.ror(edx, 4)
         ebp = self.sboxul[0][ebx >> 2]
         ebx = (ebx & 0xFFFFFF00) | (edx & 0x000000FF)
         dst ^= ebp
@@ -222,74 +228,74 @@ class XP_DES():
         esi = encrypted
         eax = struct.unpack('<L', esi[:4])[0]
         edi = struct.unpack('<L', esi[4:])[0]
-        eax = self.rol(eax, 4, 32)
+        eax = self.rol(eax, 4)
         esi = eax
         eax = eax ^ edi
         eax = eax & 0x0F0F0F0F0
         esi = esi ^ eax
         edi = edi ^ eax
-        edi = self.rol(edi, 0x14, 32)
+        edi = self.rol(edi, 0x14)
         eax = edi
         edi = edi ^ esi
         edi = edi & 0x0FFF0000F
         eax = eax ^ edi
         esi = esi ^ edi
-        eax = self.rol(eax, 0x0e, 32)
+        eax = self.rol(eax, 0x0e)
         edi = eax
         eax = eax ^ esi
         eax = eax & 0x33333333
         edi = edi ^ eax
         esi = esi ^ eax
-        esi = self.rol(esi, 0x16, 32)
+        esi = self.rol(esi, 0x16)
         eax = esi
         esi = esi ^ edi
         esi = esi & 0x3FC03FC
         eax = eax ^ esi
         edi = edi ^ esi
-        eax = self.rol(eax, 0x9, 32)
+        eax = self.rol(eax, 0x9)
         esi = eax
         eax = eax ^ edi
         eax = eax & 0x0AAAAAAAA
         esi = esi ^ eax
         edi = edi ^ eax
-        edi = self.rol(edi, 0x1, 32)
+        edi = self.rol(edi, 0x1)
 
         ecx = 0
         for round in range(15, 0, -2):
             edi, ecx = self._decrypt_loop(edi, esi, ecx, round)
             esi, ecx = self._decrypt_loop(esi, edi, ecx, round-1)
 
-        esi = self.ror(esi, 1, 32)
+        esi = self.ror(esi, 1)
         eax = edi
         edi ^= esi
         edi &= 0x0AAAAAAAA
         eax ^= edi
         esi ^= edi
-        eax = self.rol(eax, 0x17, 32)
+        eax = self.rol(eax, 0x17)
         edi = eax
         eax ^= esi
         eax &= 0x3FC03FC
         edi ^= eax
         esi ^= eax
-        edi = self.rol(edi, 0x0A, 32)
+        edi = self.rol(edi, 0x0A)
         eax = edi
         edi ^= esi
         edi &= 0x33333333
         eax ^= edi
         esi ^= edi
-        esi = self.rol(esi, 0x12, 32)
+        esi = self.rol(esi, 0x12)
         edi = esi
         esi ^= eax
         esi &= 0x0FFF0000F
         edi ^= esi
         eax ^= esi
-        edi = self.rol(edi, 0x0C, 32)
+        edi = self.rol(edi, 0x0C)
         esi = edi
         edi ^= eax
         edi &= 0x0F0F0F0F0
         esi ^= edi
         eax ^= edi
-        eax = self.ror(eax, 4, 32)
+        eax = self.ror(eax, 4)
 
         return struct.pack('<L', eax) + struct.pack('<L', esi)
 
